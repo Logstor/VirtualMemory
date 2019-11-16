@@ -104,9 +104,30 @@ void initmem(strategies strategy, size_t sz)
 	next = memBlock;
 }
 
+/**
+ * Allocates a memoryList element on the Heap.
+ * @return memoryList*
+ */
+struct memoryList* makeElement()
+{
+	//TODO: Implement error handling
+	return (struct memoryList*) malloc( sizeof(struct memoryList) );
+}
+
+int mergeIntoList(struct memoryList* element)
+{
+	//TODO: Implement me!
+}
+
 void* nextFitMalloc(size_t request)
 {
+	// Create the new list element
+	struct memoryList* element = makeElement();
+	
+	// Merge element into list
+	
 
+	// Update Next pointer
 }
 
 /* Allocate a block of memory with the requested size.
