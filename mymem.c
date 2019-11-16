@@ -24,6 +24,19 @@ struct memoryList
   void *ptr;           // location of block in memory pool.
 };
 
+typedef struct
+{
+	void* memStart;
+	unsigned int size;
+}MemoryPool;
+
+typedef struct Memory
+{
+	MemoryPool memPool;
+
+};
+
+
 strategies myStrategy = NotSet;    // Current strategy
 
 
