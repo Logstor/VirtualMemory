@@ -48,7 +48,6 @@ int getMemTotal();
 int getMemHoles();
 int getMemAllocated();
 int getMemFree();
-int getMemTotal();
 int getMemLargestFree();
 int getMemSmallFree(int size);
 char isMemAlloc(void *ptr);
@@ -206,8 +205,31 @@ int getMemFree()
     return bytes;
 }
 
+/**
+ * Number of bytes in the largest contiguous area 
+ * of unallocated memory. It returns -1 if there's 
+ * no more free memory.
+ * @return Amount of bytes
+ */
+int getMemLargestFree()
+{
+    int largest = -1;
+    Element* element = memory.tail;
 
-int getMemTotal();
-int getMemLargestFree();
+    while (element != NULL)
+    {
+        // Check if it's free and bigger
+        if (element->alloc == 0 || element->size > largest)
+            largest = element->size;
+
+        // Get next element
+        element = element->next;
+    }
+
+    return largest;
+    
+}
+
+
 int getMemSmallFree(int size);
 char isMemAlloc(void *ptr);
