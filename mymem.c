@@ -51,7 +51,25 @@ static struct memoryList *next;
  */ 
 void freeAllBlocks()
 {
-	//TODO: Implement me!
+	// Find first element 
+	struct memoryList* element = findFirstElement();
+
+	// Loop through every element and free
+	struct memoryList* nextElement;
+	while (element != NULL)
+	{
+		// Get next element
+		nextElement = element->next;
+
+		// Free current element
+		free(element);
+
+		// Rotate elements
+		element = nextElement;
+	}
+
+	// Free memory pool
+	free(myMemory);
 }
 
 /**
@@ -118,7 +136,19 @@ void *mymalloc(size_t requested)
 
 struct memoryList* findElement(void* address)
 {
-	//TODO: Implement this!
+	// Find first element
+	struct memoryList* element = findFirstElement();
+
+	// Loop through elements
+	while (1)
+	{
+		//TODO: Doesn't account for next element could be null
+		if (address >= element->ptr && address < element->next->ptr)
+			return element;
+		
+		element = element->next;
+	}
+	
 }
 
 /**
