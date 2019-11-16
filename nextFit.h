@@ -119,7 +119,7 @@ void initialize(size_t size)
 
 void* nextMalloc(size_t requested) 
 {
-
+    return NULL;
 }
 
 void nextFree(void* block) 
@@ -157,4 +157,28 @@ int getMemHoles()
         // Get next element
         element = element->next;
     }
+
+    return holes;
+}
+
+/**
+ * Finds the amount of memory allocated in bytes.
+ * @return Bytes allocated
+ */
+int getMemAllocated()
+{
+    int bytes = 0;
+    Element* element = memory.tail;
+
+    while (element != NULL)
+    {
+        // Check if it's allocated
+        if (element->alloc != 0)
+            bytes += element->size;
+
+        // Get next element
+        element = element->next;
+    }
+
+    return bytes;
 }
