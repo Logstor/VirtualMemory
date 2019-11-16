@@ -330,8 +330,22 @@ int mem_holes()
 /* Get the number of bytes allocated */
 int mem_allocated()
 {
-	// 
-	return 0;
+	int allocMem = 0;
+
+	// Find first element
+	struct memoryList* element = findFirstElement();
+
+	// Count allocated memory
+	while (element != NULL)
+	{
+		if (element->alloc != 0)
+			allocMem += element->size;
+
+		element = element->next;
+	}
+
+	// Return amount of allocated memory
+	return allocMem;
 }
 
 /* Number of non-allocated bytes */
