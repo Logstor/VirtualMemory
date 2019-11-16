@@ -4,6 +4,10 @@
 #include <string.h>
 #include <stdio.h>
 
+/*
+ * Structs
+ */
+
 typedef struct 
 {
     Element* next;
@@ -19,17 +23,22 @@ typedef struct
 typedef struct
 {
 	void* memStart;
-	unsigned int size;
+	size_t size;
 }MemoryPool;
 
 typedef struct
 {
 	MemoryPool memPool;
-	struct memoryList* head;
-	struct memoryList* tail;
-	struct memoryList* next;
+	Element* head;
+	Element* tail;
+	Element* next;
 }Memory;
 
+/*
+ * Prototypes
+*/
+
+void clean();
 void initialize(size_t size);
 void* nextMalloc(size_t requested);
 void nextFree(void* block);
@@ -43,3 +52,43 @@ int getMemTotal();
 int getMemLargestFree();
 int getMemSmallFree(int size);
 char isMemAlloc(void *ptr);
+
+/*
+ * Globals
+ */
+
+Memory memory;
+
+/*
+ * Implementations
+ */
+
+void initialize(size_t size)
+{
+    // Check parameter
+    if (size < 1)
+    {
+        printf("ERROR: Trying to initialize with less 1 byte size!\n");
+        return;
+    }
+
+    // Check if memory is already initialized
+    if (memory.memPool.memStart != NULL)
+    {
+        printf("WARNING: Initializing memory again!\n");
+        clean();
+    }
+
+    // Create memory pool
+    memory.memPool.size = size;
+    memory.memPool.memStart = malloc(size);
+
+    // Start linked list
+    memory.head = (Element*) malloc( sizeof(Element) );
+    memory.head->size = size;
+    memory.head->alloc = 0;
+    memory.head->ptr = memory.memPool.memStart;
+    memory.tail = memory.head;
+    memory.next = memory.head;
+
+}
