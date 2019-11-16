@@ -393,7 +393,22 @@ int mem_largest_free()
 /* Number of free blocks smaller than "size" bytes. */
 int mem_small_free(int size)
 {
-	return 0;
+	int num = 0;
+
+	// Find first element
+	struct memoryList* element = findFirstElement();
+
+	// Loop through all elements
+	while (element != NULL)
+	{
+		if (element->alloc == 0 || element->size < size)
+			num++;
+
+		element = element->next;
+	}
+
+	// Return number of elements found
+	return num;
 }       
 
 char mem_is_alloc(void *ptr)
