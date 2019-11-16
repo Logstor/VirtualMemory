@@ -288,17 +288,31 @@ void myfree(void* block)
  * memory pool this module manages via initmem/mymalloc/myfree. 
  */
 
+/**
+ * Searches through the elements until it hits the first.
+ * @return The first memoryList*
+ */
+struct memoryList* findFirstElement()
+{
+	struct memoryList* element = next;
+	
+	// Loop backwards through elements until it hits first element
+	while (1)
+	{
+		if (element->last == NULL)
+			return element;
+		else
+			element = element->last;
+	}
+}
+
 /* Get the number of contiguous areas of free space in memory. */
 int mem_holes()
 {
 	int holes = 0;
-	struct memoryList* element = next;
-
-	// Go back until first element
-	while (element->last != NULL)
-	{
-		element = element->last;
-	}
+	
+	// Get first element
+	struct memoryList* element = findFirstElement();
 
 	// Go forward and count holes
 	while (element != NULL)
@@ -316,6 +330,7 @@ int mem_holes()
 /* Get the number of bytes allocated */
 int mem_allocated()
 {
+	// 
 	return 0;
 }
 
