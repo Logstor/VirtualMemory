@@ -182,3 +182,32 @@ int getMemAllocated()
 
     return bytes;
 }
+
+/**
+ * Finds the amount of bytes which is free in 
+ * the memory pool.
+ * @return Amount of bytes free
+ */
+int getMemFree()
+{
+    int bytes = 0;
+    Element* element = memory.tail;
+
+    while (element != NULL)
+    {
+        // Check if it's free
+        if (element->alloc == 0)
+            bytes += element->size;
+
+        // Get next element
+        element = element->next;
+    }
+
+    return bytes;
+}
+
+
+int getMemTotal();
+int getMemLargestFree();
+int getMemSmallFree(int size);
+char isMemAlloc(void *ptr);
