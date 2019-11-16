@@ -24,20 +24,6 @@ struct memoryList
   void *ptr;           // location of block in memory pool.
 };
 
-typedef struct
-{
-	void* memStart;
-	unsigned int size;
-}MemoryPool;
-
-typedef struct
-{
-	MemoryPool memPool;
-	struct memoryList* head;
-	struct memoryList* tail;
-	struct memoryList* next;
-}Memory;
-
 
 strategies myStrategy = NotSet;    // Current strategy
 
