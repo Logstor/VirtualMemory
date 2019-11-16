@@ -351,7 +351,22 @@ int mem_allocated()
 /* Number of non-allocated bytes */
 int mem_free()
 {
-	return 0;
+	int nonAlloc = 0;
+
+	// Find first element
+	struct memoryList* element = findFirstElement();
+
+	// Loop through all elements and count nonAlloc
+	while (element != NULL)
+	{
+		if (element->alloc == 0)
+			nonAlloc += element->size;
+		
+		element = element->next;
+	}
+	
+	// Return number of non-Allocated bytes
+	return nonAlloc;
 }
 
 /* Number of bytes in the largest contiguous area of unallocated memory */
