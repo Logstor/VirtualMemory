@@ -63,6 +63,30 @@ Memory memory;
  * Implementations
  */
 
+/**
+ * Frees all memory allocated in this structure.
+ */
+void clean()
+{
+    // Free memory pool
+    free(memory.memPool.memStart);
+
+    // Free all elements in list
+    Element* element = memory.tail;
+    Element* temp;
+    while (element != NULL)
+    {
+        // Get new element
+        temp = element->next;
+
+        // Free memory
+        free(element);
+
+        // Rotate
+        element = temp;
+    }
+}
+
 void initialize(size_t size)
 {
     // Check parameter
