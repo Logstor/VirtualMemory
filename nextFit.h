@@ -116,3 +116,25 @@ void initialize(size_t size)
     memory.next = memory.head;
 
 }
+
+void* nextMalloc(size_t requested) 
+{
+
+}
+
+void nextFree(void* block) 
+{
+
+}
+
+/**
+ * Gets access to the actual memory pool.
+ * @return pointer to pool
+ */
+void* getMemPool() { return memory.memPool.memStart; }
+
+/**
+ * Gets the amount of bytes in memory pool.
+ * @return Amount of bytes
+ */
+int getMemTotal() { return memory.memPool.size; }
