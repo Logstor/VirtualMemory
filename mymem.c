@@ -6,6 +6,8 @@
 #include <time.h>
 
 
+struct memoryList* findFirstElement();
+
 /* The main structure for implementing memory allocation.
  * You may change this to fit your implementation.
  */
