@@ -30,11 +30,13 @@ typedef struct
 	unsigned int size;
 }MemoryPool;
 
-typedef struct Memory
+typedef struct
 {
 	MemoryPool memPool;
-
-};
+	struct memoryList* head;
+	struct memoryList* tail;
+	struct memoryList* next;
+}Memory;
 
 
 strategies myStrategy = NotSet;    // Current strategy
