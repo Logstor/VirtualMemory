@@ -411,10 +411,11 @@ int mem_small_free(int size)
 	return num;
 }       
 
-char mem_is_alloc(void *ptr)
-{
-        return 0;
-}
+/**
+ * Decides whether the memory is allocated or not.
+ * @return true or false
+ */
+char mem_is_alloc(void *ptr) { return findElement(ptr)->alloc; }
 
 /* 
  * Feel free to use these functions, but do not modify them.  
