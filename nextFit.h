@@ -30,4 +30,16 @@ typedef struct
 	struct memoryList* next;
 }Memory;
 
+void initialize(size_t size);
+void* nextMalloc(size_t requested);
+void nextFree(void* block);
 
+void* getMemPool();
+int getMemTotal();
+int getMemHoles();
+int getMemAllocated();
+int getMemFree();
+int getMemTotal();
+int getMemLargestFree();
+int getMemSmallFree(int size);
+char isMemAlloc(void *ptr);
