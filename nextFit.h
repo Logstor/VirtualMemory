@@ -138,3 +138,23 @@ void* getMemPool() { return memory.memPool.memStart; }
  * @return Amount of bytes
  */
 int getMemTotal() { return memory.memPool.size; }
+
+/**
+ * Finds the amount of holes in the memory pool.
+ * @return Amount of holes
+ */
+int getMemHoles()
+{
+    int holes = 0; 
+    Element* element = memory.tail;
+
+    while (element != NULL)
+    {
+        // Check if it's free
+        if (element->alloc == 0)
+            holes++;
+
+        // Get next element
+        element = element->next;
+    }
+}
