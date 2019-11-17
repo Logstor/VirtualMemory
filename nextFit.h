@@ -52,6 +52,8 @@ int getMemLargestFree();
 int getMemSmallFree(int size);
 char isMemAlloc(void *ptr);
 
+Element* findByAddress(void* ptr);
+
 /*
  * Globals
  */
@@ -230,6 +232,63 @@ int getMemLargestFree()
     
 }
 
+/**
+ * Sums amount of free blocks smaller than "size" bytes.
+ * @param size Bytes
+ * @return Amount of blocks
+ */
+int getMemSmallFree(size_t size)
+{
+    int blocks = 0;
+    Element* element = memory.tail;
 
-int getMemSmallFree(int size);
-char isMemAlloc(void *ptr);
+    while (element != NULL)
+    {
+        // Check size and if it's allocated
+        if (element->alloc == 0 || element->size < size)
+            blocks++;
+
+        // Get next element
+        element = element->next;
+    }
+
+    return blocks;
+
+}
+
+/**
+ * Figures if the memory location provided is occupied.
+ * @param ptr Pointer to address of interest
+ * @return true or false
+ */
+char isMemAlloc(void *ptr) { return findByAddress(ptr) != NULL ? 666 : 0 ; }
+
+/*
+ * Support Methods
+ */
+
+/**
+ * Finds the element in the linked list, which 
+ * holds this address. If it isn't possible 
+ * to find the element, then it returns NULL.
+ * @param ptr The address or NULL if not found
+ * @return Element*
+ */
+Element* findByAddress(void* ptr)
+{
+    // Start from the tail
+    Element* element = memory.tail;
+
+    while (element != NULL)
+    {
+        // Check if ptr is in range
+        if (element->ptr <= ptr || (element->ptr + element->size) > ptr)
+            return element;
+
+        // Get next element
+        element = element->next;
+    }
+
+    // If not found then return NULL
+    return NULL;
+}
