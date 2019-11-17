@@ -4,6 +4,7 @@
 #include <assert.h>
 #include "mymem.h"
 #include <time.h>
+#include "nextFit.h"
 
 
 struct memoryList* findFirstElement();
@@ -88,23 +89,33 @@ void initmem(strategies strategy, size_t sz)
 
 	myStrategy = strategy;
 
-	/* all implementations will need an actual block of memory to use */
-	mySize = sz;
-
-	if (myMemory != NULL) free(myMemory); /* in case this is not the first time initmem2 is called */
-
-	/* release any other memory you were using for bookkeeping when doing a re-initialization! */
-	freeAllBlocks();
-
-	// Allocate memory
-	myMemory = malloc(sz);
+	switch (myStrategy)
+	{
+	case Next:
+		initialize(sz);
+		break;
 	
-	// Initialize memory management structure
-	struct memoryList *memBlock = (struct memoryList*)malloc(sizeof(struct memoryList));
-	memBlock->ptr = myMemory;
-	memBlock->size = sz;
-	memBlock->alloc = 0;
-	next = memBlock;
+	default:
+		/* all implementations will need an actual block of memory to use */
+		mySize = sz;
+
+		if (myMemory != NULL) free(myMemory); /* in case this is not the first time initmem2 is called */
+
+		/* release any other memory you were using for bookkeeping when doing a re-initialization! */
+		freeAllBlocks();
+
+		// Allocate memory
+		myMemory = malloc(sz);
+		
+		// Initialize memory management structure
+		struct memoryList *memBlock = (struct memoryList*)malloc(sizeof(struct memoryList));
+		memBlock->ptr = myMemory;
+		memBlock->size = sz;
+		memBlock->alloc = 0;
+		next = memBlock;
+		break;
+	}
+	
 }
 
 /**
@@ -153,7 +164,7 @@ void *mymalloc(size_t requested)
 	  case Worst:
 	            return NULL;
 	  case Next:
-	            return nextFitMalloc(requested);
+	            return nextMalloc(requested);
 	  }
 	return NULL;
 }
@@ -317,23 +328,30 @@ void mergeBlock(struct memoryList* block)
 /* Frees a block of memory previously allocated by mymalloc. */
 void myfree(void* block)
 {
-	// Find element
-	struct memoryList* element = findElement(block);
-	if (element == NULL)
+	switch (myStrategy)
 	{
-		//TODO: Validate this
-		printf("ERROR: Memory doesn't exist!\n");
-		assert(0);
-		return;
-	}
-
-	// Set alloc
-	element->alloc = 0;
-
-	// Merge with free blocks
-	mergeBlock(element);
+	case Next:
+		nextFree(block);
+		break;
 	
-	return;
+	default:
+		// Find element
+		struct memoryList* element = findElement(block);
+		if (element == NULL)
+		{
+			//TODO: Validate this
+			printf("ERROR: Memory doesn't exist!\n");
+			assert(0);
+			return;
+		}
+
+		// Set alloc
+		element->alloc = 0;
+
+		// Merge with free blocks
+		mergeBlock(element);
+		break;
+	}
 }
 
 /****** Memory status/property functions ******
@@ -363,113 +381,163 @@ struct memoryList* findFirstElement()
 /* Get the number of contiguous areas of free space in memory. */
 int mem_holes()
 {
-	int holes = 0;
-	
-	// Get first element
-	struct memoryList* element = findFirstElement();
-
-	// Go forward and count holes
-	while (element != NULL)
+	switch (myStrategy)
 	{
-		if (element->alloc == 0)
-			holes++;
-		
-		element = element->next;
-	}
+	case Next:
+		return getMemHoles();
+	
+	default:
+		int holes = 0;
+	
+		// Get first element
+		struct memoryList* element = findFirstElement();
 
-	// Return the amount of holes
-	return holes;
+		// Go forward and count holes
+		while (element != NULL)
+		{
+			if (element->alloc == 0)
+				holes++;
+			
+			element = element->next;
+		}
+
+		// Return the amount of holes
+		return holes;
+	}
 }
 
 /* Get the number of bytes allocated */
 int mem_allocated()
 {
-	int allocMem = 0;
-
-	// Find first element
-	struct memoryList* element = findFirstElement();
-
-	// Count allocated memory
-	while (element != NULL)
+	switch (myStrategy)
 	{
-		if (element->alloc != 0)
-			allocMem += element->size;
+	case Next:
+		return getMemAllocated();
+	
+	default:
+		int allocMem = 0;
 
-		element = element->next;
+		// Find first element
+		struct memoryList* element = findFirstElement();
+
+		// Count allocated memory
+		while (element != NULL)
+		{
+			if (element->alloc != 0)
+				allocMem += element->size;
+
+			element = element->next;
+		}
+
+		// Return amount of allocated memory
+		return allocMem;
 	}
 
-	// Return amount of allocated memory
-	return allocMem;
+	
 }
 
 /* Number of non-allocated bytes */
 int mem_free()
 {
-	int nonAlloc = 0;
-
-	// Find first element
-	struct memoryList* element = findFirstElement();
-
-	// Loop through all elements and count nonAlloc
-	while (element != NULL)
+	switch (myStrategy)
 	{
-		if (element->alloc == 0)
-			nonAlloc += element->size;
+	case Next:
+		return getMemFree();
+	
+	default:
+		int nonAlloc = 0;
+
+		// Find first element
+		struct memoryList* element = findFirstElement();
+
+		// Loop through all elements and count nonAlloc
+		while (element != NULL)
+		{
+			if (element->alloc == 0)
+				nonAlloc += element->size;
+			
+			element = element->next;
+		}
 		
-		element = element->next;
+		// Return number of non-Allocated bytes
+		return nonAlloc;
 	}
 	
-	// Return number of non-Allocated bytes
-	return nonAlloc;
 }
 
 /* Number of bytes in the largest contiguous area of unallocated memory */
 int mem_largest_free()
 {
-	int large = -1;
-
-	// Find first element
-	struct memoryList* element = findFirstElement();
-
-	// Loop through all elements
-	while (element != NULL)
+	switch (myStrategy)
 	{
-		if (element->alloc == 0 || element->size > large)
-			large = element->size;
+	case Next:
+		return getMemLargestFree();
+	
+	default:
+		int large = -1;
 
-		element = element->next;
+		// Find first element
+		struct memoryList* element = findFirstElement();
+
+		// Loop through all elements
+		while (element != NULL)
+		{
+			if (element->alloc == 0 || element->size > large)
+				large = element->size;
+
+			element = element->next;
+		}
+
+		// Return the largest free space
+		return large;
 	}
-
-	// Return the largest free space
-	return large;
+	
 }
 
 /* Number of free blocks smaller than "size" bytes. */
 int mem_small_free(int size)
 {
-	int num = 0;
-
-	// Find first element
-	struct memoryList* element = findFirstElement();
-
-	// Loop through all elements
-	while (element != NULL)
+	switch (myStrategy)
 	{
-		if (element->alloc == 0 || element->size < size)
-			num++;
+	case Next:
+		return getMemSmallFree(size);
+	
+	default:
+		int num = 0;
 
-		element = element->next;
+		// Find first element
+		struct memoryList* element = findFirstElement();
+
+		// Loop through all elements
+		while (element != NULL)
+		{
+			if (element->alloc == 0 || element->size < size)
+				num++;
+
+			element = element->next;
+		}
+
+		// Return number of elements found
+		return num;
 	}
-
-	// Return number of elements found
-	return num;
+	
 }       
 
 /**
  * Decides whether the memory is allocated or not.
  * @return true or false
  */
-char mem_is_alloc(void *ptr) { return findElement(ptr)->alloc; }
+char mem_is_alloc(void *ptr) 
+{
+	switch (myStrategy)
+	{
+	case Next:
+		return isMemAlloc(ptr);
+	
+	default:
+		return findElement(ptr)->alloc;
+	}
+}
 
 /* 
  * Feel free to use these functions, but do not modify them.  
@@ -480,13 +548,27 @@ char mem_is_alloc(void *ptr) { return findElement(ptr)->alloc; }
 //Returns a pointer to the memory pool.
 void *mem_pool()
 {
-	return myMemory;
+	switch (myStrategy)
+	{
+	case Next:
+		return getMemPool();
+	
+	default:
+		return myMemory;
+	}
 }
 
 // Returns the total number of bytes in the memory pool. */
 int mem_total()
 {
-	return mySize;
+	switch (myStrategy)
+	{
+	case Next:
+		return getMemTotal();
+	
+	default:
+		return mySize;
+	}
 }
 
 
