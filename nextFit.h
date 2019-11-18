@@ -54,6 +54,7 @@ char isMemAlloc(void *ptr);
 void printMemory();
 
 Element* findByAddress(void* ptr);
+Element* allocateBlock(Element* space, size_t size);
 
 /*
  * Globals
@@ -121,8 +122,35 @@ void initialize(size_t size)
 
 void* nextMalloc(size_t requested) 
 {
+    //FIXME: Not done!
+
+    Element* allocated;
+
+    // Get current position
+    Element* element = memory.next;
+
+    // Find space
+    do
+    {
+        // Check NULL
+        if (element == NULL)
+        {
+            element = memory.tail;
+            continue;
+        }
+
+        // Check space and alloc
+        if (element->alloc == 0 || element->size >= requested)
+        {
+            allocated = allocateBlock(element, requested);
+            //TODO: Undone
+            break;
+        }
+
+    } while (element != memory.next);
     
-    return NULL;
+
+    return allocated->ptr;
 }
 
 void nextFree(void* block) 
@@ -283,6 +311,9 @@ void printMemory()
         count++;
         element = element->next;
     }
+
+    // Make extra spacing
+    puts("");
 }
 
 /*
@@ -313,4 +344,16 @@ Element* findByAddress(void* ptr)
 
     // If not found then return NULL
     return NULL;
+}
+
+/**
+ * This method allocates the memory, and takes care of 
+ * splitting Elements, next, head and tail.
+ * @param space Pointer to Element with enough space
+ * @param size Space needed in bytes
+ * @return Pointer to the allocated block
+ */
+Element* allocateBlock(Element* space, size_t size)
+{
+
 }
