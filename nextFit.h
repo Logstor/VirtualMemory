@@ -8,10 +8,10 @@
  * Structs
  */
 
-typedef struct 
+typedef struct Element
 {
-    Element* next;
-    Element* prev;
+    struct Element* next;
+    struct Element* prev;
 
     int size;           // How many bytes in this block?
     char alloc;         // 1 if this block is allocated,
@@ -121,6 +121,7 @@ void initialize(size_t size)
 
 void* nextMalloc(size_t requested) 
 {
+    
     return NULL;
 }
 
@@ -276,7 +277,7 @@ void printMemory()
     while (element != NULL)
     {
         // Print
-        printf("Element %u\n\tSize: %d\n\tAllocated: %c\n", count, element->size, element->alloc);
+        printf("Element %u\n\tSize: %d\n\tAllocated: %d\n", count, element->size, element->alloc);
 
         // Get next element
         count++;
