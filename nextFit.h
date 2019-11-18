@@ -8,10 +8,10 @@
  * Structs
  */
 
-typedef struct 
+typedef struct Element
 {
-    Element* next;
-    Element* prev;
+    struct Element* next;
+    struct Element* prev;
 
     int size;           // How many bytes in this block?
     char alloc;         // 1 if this block is allocated,
@@ -49,10 +49,12 @@ int getMemHoles();
 int getMemAllocated();
 int getMemFree();
 int getMemLargestFree();
-int getMemSmallFree(int size);
+int getMemSmallFree(size_t size);
 char isMemAlloc(void *ptr);
+void printMemory();
 
 Element* findByAddress(void* ptr);
+Element* allocateBlock(Element* space, size_t size);
 
 /*
  * Globals
@@ -115,17 +117,54 @@ void initialize(size_t size)
     memory.head->ptr = memory.memPool.memStart;
     memory.tail = memory.head;
     memory.next = memory.head;
-
 }
 
+/**
+ * Takes care of allocating memory using the next fit
+ * strategy. It takes the size of the desired memory in bytes, 
+ * and returns the pointer to the memory. It will return NULL 
+ * if no memory is available.
+ * @param requested Size in bytes
+ * @return Pointer to memory
+ */
 void* nextMalloc(size_t requested) 
 {
-    return NULL;
+    Element* allocated;
+
+    // Get current position
+    Element* element = memory.next;
+
+    // Find space
+    do
+    {
+        // Check NULL
+        if (element == NULL)
+        {
+            element = memory.tail;
+        }
+
+        // Check space and alloc
+        if (element->alloc == 0 || element->size >= requested)
+        {
+            allocated = allocateBlock(element, requested);
+            memory.next = allocated->next;
+            break;
+        }
+
+        // Get next element
+        element = element->next;
+
+    } while (element != memory.next);
+
+    //TODO: Remove
+    print_memory();
+    
+    return allocated->ptr;
 }
 
 void nextFree(void* block) 
 {
-
+    //TODO: Implement this!
 }
 
 /**
@@ -263,6 +302,29 @@ int getMemSmallFree(size_t size)
  */
 char isMemAlloc(void *ptr) { return findByAddress(ptr) != NULL ? 666 : 0 ; }
 
+/**
+ * 
+ */
+void printMemory()
+{
+    // Get first element
+    unsigned int count = 0;
+    Element* element = memory.tail;
+
+    while (element != NULL)
+    {
+        // Print
+        printf("Element %u\n\tSize: %d\n\tAllocated: %d\n", count, element->size, element->alloc);
+
+        // Get next element
+        count++;
+        element = element->next;
+    }
+
+    // Make extra spacing
+    puts("");
+}
+
 /*
  * Support Methods
  */
@@ -291,4 +353,55 @@ Element* findByAddress(void* ptr)
 
     // If not found then return NULL
     return NULL;
+}
+
+/**
+ * This method allocates the memory, and takes care of 
+ * splitting Elements, head and tail.
+ * @param space Pointer to Element with enough space
+ * @param size Space needed in bytes
+ * @return Pointer to the allocated block
+ */
+Element* allocateBlock(Element* space, size_t size)
+{
+    // Space is bigger
+    if (space->size > size)
+    {
+        // Split the block of space in two
+        Element* newElement = (Element*) malloc( sizeof(Element) );
+        newElement->next = space;
+        newElement->prev = space->prev;
+        newElement->ptr  = space->ptr;
+        newElement->size = size;
+        newElement->alloc= 1;
+
+        space->prev  = newElement;
+        space->ptr  += size;
+        space->size -= size;
+
+        if (newElement->prev != NULL)
+            newElement->prev->next = newElement;
+
+        // Take care of tail
+        if (newElement->prev == NULL)
+            memory.tail = newElement;
+
+        return newElement;
+    }
+
+    // Space is equal
+    else if (space->size == size)
+    {
+        // Just allocate space, and return
+        space->alloc = 1; return space;
+    }
+
+    // Error occurred
+    else
+    {
+        // Write error to log
+        printf("ERROR: allocateBlock() is called, when there isn't not enough space:\n");
+        printf("\tRequested Size: %lu\n\tSize of Block: %u\n", size, space->size);
+        return NULL;
+    }
 }
