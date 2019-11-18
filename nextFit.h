@@ -120,10 +120,16 @@ void initialize(size_t size)
 
 }
 
+/**
+ * Takes care of allocating memory using the next fit
+ * strategy. It takes the size of the desired memory in bytes, 
+ * and returns the pointer to the memory. It will return NULL 
+ * if no memory is available.
+ * @param requested Size in bytes
+ * @return Pointer to memory
+ */
 void* nextMalloc(size_t requested) 
 {
-    //FIXME: Not done!
-
     Element* allocated;
 
     // Get current position
@@ -136,26 +142,27 @@ void* nextMalloc(size_t requested)
         if (element == NULL)
         {
             element = memory.tail;
-            continue;
         }
 
         // Check space and alloc
         if (element->alloc == 0 || element->size >= requested)
         {
             allocated = allocateBlock(element, requested);
-            //TODO: Undone
+            memory.next = allocated->next;
             break;
         }
 
+        // Get next element
+        element = element->next;
+
     } while (element != memory.next);
     
-
     return allocated->ptr;
 }
 
 void nextFree(void* block) 
 {
-
+    //TODO: Implement this!
 }
 
 /**
@@ -348,12 +355,48 @@ Element* findByAddress(void* ptr)
 
 /**
  * This method allocates the memory, and takes care of 
- * splitting Elements, next, head and tail.
+ * splitting Elements, head and tail.
  * @param space Pointer to Element with enough space
  * @param size Space needed in bytes
  * @return Pointer to the allocated block
  */
 Element* allocateBlock(Element* space, size_t size)
 {
+    // Space is bigger
+    if (space->size > size)
+    {
+        // Split the block of space in two
+        Element* newElement = (Element*) malloc( sizeof(Element) );
+        newElement->next = space;
+        newElement->prev = space->prev;
+        newElement->ptr  = space->ptr;
+        newElement->size = size;
+        newElement->alloc= 1;
 
+        space->prev  = newElement;
+        space->ptr  += size;
+        space->size -= size;
+
+        // Take care of tail
+        if (newElement->prev == NULL)
+            memory.tail = newElement;
+
+        return newElement;
+    }
+
+    // Space is equal
+    else if (space->size == size)
+    {
+        // Just allocate space, and return
+        space->alloc = 1; return space;
+    }
+
+    // Error occurred
+    else
+    {
+        // Write error to log
+        printf("ERROR: allocateBlock() is called, when there isn't not enough space:\n");
+        printf("\tRequested Size: %lu\n\tSize of Block: %u\n", size, space->size);
+        return NULL;
+    }
 }
