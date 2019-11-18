@@ -117,7 +117,6 @@ void initialize(size_t size)
     memory.head->ptr = memory.memPool.memStart;
     memory.tail = memory.head;
     memory.next = memory.head;
-
 }
 
 /**
@@ -156,6 +155,9 @@ void* nextMalloc(size_t requested)
         element = element->next;
 
     } while (element != memory.next);
+
+    //TODO: Remove
+    print_memory();
     
     return allocated->ptr;
 }
@@ -376,6 +378,9 @@ Element* allocateBlock(Element* space, size_t size)
         space->prev  = newElement;
         space->ptr  += size;
         space->size -= size;
+
+        if (newElement->prev != NULL)
+            newElement->prev->next = newElement;
 
         // Take care of tail
         if (newElement->prev == NULL)
