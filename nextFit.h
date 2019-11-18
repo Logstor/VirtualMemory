@@ -49,8 +49,9 @@ int getMemHoles();
 int getMemAllocated();
 int getMemFree();
 int getMemLargestFree();
-int getMemSmallFree(int size);
+int getMemSmallFree(size_t size);
 char isMemAlloc(void *ptr);
+void printMemory();
 
 Element* findByAddress(void* ptr);
 
@@ -262,6 +263,26 @@ int getMemSmallFree(size_t size)
  * @return true or false
  */
 char isMemAlloc(void *ptr) { return findByAddress(ptr) != NULL ? 666 : 0 ; }
+
+/**
+ * 
+ */
+void printMemory()
+{
+    // Get first element
+    unsigned int count = 0;
+    Element* element = memory.tail;
+
+    while (element != NULL)
+    {
+        // Print
+        printf("Element %u\n\tSize: %d\n\tAllocated: %c\n", count, element->size, element->alloc);
+
+        // Get next element
+        count++;
+        element = element->next;
+    }
+}
 
 /*
  * Support Methods
