@@ -147,7 +147,7 @@ void* nextMalloc(size_t requested)
         }
 
         // Check space and alloc
-        if (element->alloc == 0 || element->size >= requested)
+        if (element->alloc == 0 && element->size >= requested)
         {
             allocated = allocateBlock(element, requested);
             memory.next = allocated->next;
