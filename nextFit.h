@@ -352,14 +352,18 @@ Element* findByAddress(void* ptr)
     // Start from the tail
     Element* element = memory.tail;
 
-    while (element != NULL)
+    // Sure the pointer is even in the pool
+    if ( ptr >= memory.memPool.memStart && ptr < (memory.memPool.memStart + memory.memPool.size) )
     {
-        // Check if ptr is in range
-        if (element->ptr <= ptr || (element->ptr + element->size) > ptr)
-            return element;
+        while (element != NULL)
+        {
+            // Check if ptr is in range
+            if (ptr >= element->ptr && ptr < (element->ptr + element->size))
+                return element;
 
-        // Get next element
-        element = element->next;
+            // Get next element
+            element = element->next;
+        }
     }
 
     // If not found then return NULL
@@ -425,17 +429,23 @@ Element* allocateBlock(Element* space, size_t size)
  */
 void freeElement(Element* element)
 {
-    //TODO: Implement this!
     // Free the block
-    element->alloc == 0;
+    element->alloc = 0;
+    memory.next = element;
 
     // Merge forward
-    if (element->next->alloc == 0)
-    { mergeForward(element); }
+    if (element->next != NULL)
+    {
+        if (element->next->alloc == 0)
+        { mergeForward(element); }
+    }
 
     // Merge backwards
-    if (element->prev->alloc == 0)
-    { mergeBackwards(element); }
+    if (element->prev != NULL)
+    {
+        if (element->prev->alloc == 0)
+        { mergeBackwards(element); }
+    }
 }
 
 /**
@@ -446,7 +456,24 @@ void freeElement(Element* element)
  * @param element The growing element
  */
 void mergeForward(Element* element)
-{}
+{
+    Element* next = element->next;
+
+    // Set next and prev ptrs
+    element->next       = next->next;
+    if (next->next != NULL)
+        next->next->prev = element;
+
+    // Correct size
+    element->size += next->size;
+
+    // Check head
+    if (element->next == NULL)
+        memory.head = element;
+
+    // Free memory
+    free(next);
+}
 
 /**
  * This merges the element with it's prev element. 
@@ -456,4 +483,6 @@ void mergeForward(Element* element)
  * @param element The growing element
  */
 void mergeBackwards(Element* element)
-{}
+{
+    //TODO: Implement this!
+}
