@@ -56,6 +56,8 @@ void printMemory();
 Element* findByAddress(void* ptr);
 Element* allocateBlock(Element* space, size_t size);
 void freeElement(Element* element);
+void mergeForward(Element* element);
+void mergeBackwards(Element* element);
 
 /*
  * Globals
@@ -429,9 +431,29 @@ void freeElement(Element* element)
 
     // Merge forward
     if (element->next->alloc == 0)
-    {}
+    { mergeForward(element); }
 
     // Merge backwards
     if (element->prev->alloc == 0)
-    {}
+    { mergeBackwards(element); }
 }
+
+/**
+ * This merges the element with it's next element.
+ * This isn't taking allocation into consideration, 
+ * but makes sure head, tail and next is correct after 
+ * the merge.
+ * @param element The growing element
+ */
+void mergeForward(Element* element)
+{}
+
+/**
+ * This merges the element with it's prev element. 
+ * This isn't taking allocation into consideration, 
+ * but makes sure head, tail and next is correct after 
+ * the merge.
+ * @param element The growing element
+ */
+void mergeBackwards(Element* element)
+{}
