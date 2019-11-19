@@ -55,6 +55,7 @@ void printMemory();
 
 Element* findByAddress(void* ptr);
 Element* allocateBlock(Element* space, size_t size);
+void freeElement(Element* element);
 
 /*
  * Globals
@@ -161,7 +162,18 @@ void* nextMalloc(size_t requested)
 
 void nextFree(void* block) 
 {
-    //TODO: Implement this!
+    // Find the correct element
+    Element* element = findByAddress(block);
+
+    // Check for error
+    if (element->alloc == 0)
+    {
+        printf("WARNING: Memory was already free!\n");
+        return;
+    }
+
+    // Free it
+    freeElement(element);
 }
 
 /**
@@ -401,4 +413,25 @@ Element* allocateBlock(Element* space, size_t size)
         printf("\tRequested Size: %lu\n\tSize of Block: %u\n", size, space->size);
         return NULL;
     }
+}
+
+/**
+ * This takes care of freeing the memory, and takes 
+ * care of merging elements. It will also handle head, 
+ * tail and next pointers.
+ * @param element Pointer to element to be freed
+ */
+void freeElement(Element* element)
+{
+    //TODO: Implement this!
+    // Free the block
+    element->alloc == 0;
+
+    // Merge forward
+    if (element->next->alloc == 0)
+    {}
+
+    // Merge backwards
+    if (element->prev->alloc == 0)
+    {}
 }
