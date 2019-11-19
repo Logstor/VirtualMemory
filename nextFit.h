@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "logger.h"
 
 /*
  * Structs
@@ -105,7 +106,7 @@ void initialize(size_t size)
     // Check if memory is already initialized
     if (memory.memPool.memStart != NULL)
     {
-        printf("WARNING: Initializing memory again!\n");
+        printf("\nWARNING: Initializing memory again!\n");
         clean();
     }
 
@@ -259,19 +260,19 @@ int getMemFree()
 
 /**
  * Number of bytes in the largest contiguous area 
- * of unallocated memory. It returns -1 if there's 
+ * of unallocated memory. It returns 0 if there's 
  * no more free memory.
  * @return Amount of bytes
  */
 int getMemLargestFree()
 {
-    int largest = -1;
+    int largest = 0;
     Element* element = memory.tail;
 
     while (element != NULL)
     {
         // Check if it's free and bigger
-        if (element->alloc == 0 || element->size > largest)
+        if (element->alloc == 0 && element->size > largest)
             largest = element->size;
 
         // Get next element
@@ -295,7 +296,7 @@ int getMemSmallFree(size_t size)
     while (element != NULL)
     {
         // Check size and if it's allocated
-        if (element->alloc == 0 || element->size < size)
+        if (element->alloc == 0 && element->size < size)
             blocks++;
 
         // Get next element
@@ -325,7 +326,7 @@ void printMemory()
     while (element != NULL)
     {
         // Print
-        printf("Element %u\n\tSize: %d\n\tAllocated: %d\n", count, element->size, element->alloc);
+        printf("Element %u\n\tSize: %d\n\tAllocated: %d\n\tPointer: %p\n", count, element->size, element->alloc, element->ptr);
 
         // Get next element
         count++;
@@ -431,7 +432,6 @@ void freeElement(Element* element)
 {
     // Free the block
     element->alloc = 0;
-    memory.next = element;
 
     // Merge forward
     if (element->next != NULL)
@@ -471,6 +471,10 @@ void mergeForward(Element* element)
     if (element->next == NULL)
         memory.head = element;
 
+    // Check next
+    if (memory.next == next)
+        memory.next = element;
+
     // Free memory
     free(next);
 }
@@ -484,5 +488,23 @@ void mergeForward(Element* element)
  */
 void mergeBackwards(Element* element)
 {
-    //TODO: Implement this!
+    Element* previous = element->prev;
+
+    // Set next and prev pointers
+    element->prev = previous->prev;
+    if (element->prev != NULL)
+        element->prev->next = element;
+
+    // Memory pool pointer
+    element->ptr = previous->ptr;
+
+    // Correct size
+    element->size += previous->size;
+
+    // Check tail
+    if (element->prev == NULL)
+        memory.tail = element;
+
+    // Free memory
+    free(previous);
 }

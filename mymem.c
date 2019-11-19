@@ -581,8 +581,9 @@ void try_mymem(int argc, char **argv) {
 	
 	/* A simple example.  
 	   Each algorithm should produce a different layout. */
-	
+	/*
 	initmem(strat,500);
+	
 	
 	a = mymalloc(100);
 	b = mymalloc(100);
@@ -591,6 +592,13 @@ void try_mymem(int argc, char **argv) {
 	d = mymalloc(50);
 	myfree(a);
 	e = mymalloc(25);
+	*/
+
+	initmem(strat, 100);
+	a = mymalloc(10);
+	b= mymalloc(1);
+	myfree(a);
+	c = mymalloc(1);
 	
 	print_memory();
 	print_memory_status();

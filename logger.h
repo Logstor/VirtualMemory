@@ -12,7 +12,7 @@ void writeLog(const char* data)
     logCount++;
     FILE* file = fopen(FILENAME, "a");
 
-    fprintf(file, "%u: %s", data);
+    fprintf(file, "%u: %s", logCount, data);
 
     fclose(file);
 }
