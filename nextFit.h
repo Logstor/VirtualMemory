@@ -155,9 +155,6 @@ void* nextMalloc(size_t requested)
         element = element->next;
 
     } while (element != memory.next);
-
-    //TODO: Remove
-    print_memory();
     
     return allocated->ptr;
 }
