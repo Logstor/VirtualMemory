@@ -223,106 +223,11 @@ int isLastFree(struct memoryList* block)
 }
 
 /**
- * Merges the current block with the next no 
- * matter if it's free or not.
- */
-void mergeForward(struct memoryList* block)
-{
-	struct memoryList* nextBlock;
-
-	// Check for null
-	if (block == NULL)
-	{
-		printf("WARNING: Trying to forward merge a NULL-block - mergeForward()\n");
-	}
-	else if (block->next == NULL)
-	{
-		printf("WARNING: Next block is NULL - mergeForward()\n");
-	}
-	// When nothing is null then merge
-	else
-	{
-		// Merge
-		nextBlock = block->next;
-		block->next = nextBlock->next;
-		block->size += nextBlock->size;
-
-		// Free memory from consumed block
-		free(nextBlock);
-	}
-}
-
-/**
- * Merges the current block with the previous no 
- * matter if it's free or not.
- */
-void mergeBackwards(struct memoryList* block)
-{
-	struct memoryList* lastBlock;
-
-	// Check for null
-	if (block == NULL)
-	{
-		printf("WARNING: Trying to backwards merge a NULL-block - mergeBackwards()\n");
-	}
-	else if (block->next == NULL)
-	{
-		printf("WARNING: Last block is NULL - mergeBackwards()\n");
-	}
-	// When nothing is null then merge
-	else
-	{
-		// Merge
-		lastBlock = block->last;
-		block->last = lastBlock->last;
-		block->size += lastBlock->size;
-		block->ptr = lastBlock->ptr;
-
-		// Free memory
-		free(lastBlock);
-	}
-}
-
-/**
  * This function merges the block recursively until it's 
  * surrounded with allocated blocks.
  */
 void mergeBlock(struct memoryList* block)
 {
-	// Check if block is null
-	if (block == NULL)
-	{
-		printf("WARNING: Block is NULL in mergeBlock()\n");
-		return;
-	}
-
-	// Check if block is free
-	if (block->alloc != 0)
-	{
-		printf("WARNING: Block is allocated - Can't free - mergeBlock()\n");
-		return;
-	}
-
-	// Check if next element is free
-	if (isNextFree(block))
-	{
-		// Merge forward
-		mergeForward(block);
-		// Recursive call
-		mergeBlock(block);
-	}
-
-	// Check if previous element is free
-	else if (isLastFree(block))
-	{
-		// Merge backwards
-		mergeBackwards(block);
-		// Recursive call
-		mergeBlock(block);
-	}
-
-	// Stop
-	return;
 }
 
 /* Frees a block of memory previously allocated by mymalloc. */
