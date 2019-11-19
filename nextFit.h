@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "logger.h"
 
 /*
  * Structs
@@ -55,6 +56,9 @@ void printMemory();
 
 Element* findByAddress(void* ptr);
 Element* allocateBlock(Element* space, size_t size);
+void freeElement(Element* element);
+void mergeForward(Element* element);
+void mergeBackwards(Element* element);
 
 /*
  * Globals
@@ -102,7 +106,7 @@ void initialize(size_t size)
     // Check if memory is already initialized
     if (memory.memPool.memStart != NULL)
     {
-        printf("WARNING: Initializing memory again!\n");
+        printf("\nWARNING: Initializing memory again!\n");
         clean();
     }
 
@@ -144,7 +148,7 @@ void* nextMalloc(size_t requested)
         }
 
         // Check space and alloc
-        if (element->alloc == 0 || element->size >= requested)
+        if (element->alloc == 0 && element->size >= requested)
         {
             allocated = allocateBlock(element, requested);
             memory.next = allocated->next;
@@ -155,16 +159,24 @@ void* nextMalloc(size_t requested)
         element = element->next;
 
     } while (element != memory.next);
-
-    //TODO: Remove
-    print_memory();
     
     return allocated->ptr;
 }
 
 void nextFree(void* block) 
 {
-    //TODO: Implement this!
+    // Find the correct element
+    Element* element = findByAddress(block);
+
+    // Check for error
+    if (element->alloc == 0)
+    {
+        printf("WARNING: Memory was already free!\n");
+        return;
+    }
+
+    // Free it
+    freeElement(element);
 }
 
 /**
@@ -248,19 +260,19 @@ int getMemFree()
 
 /**
  * Number of bytes in the largest contiguous area 
- * of unallocated memory. It returns -1 if there's 
+ * of unallocated memory. It returns 0 if there's 
  * no more free memory.
  * @return Amount of bytes
  */
 int getMemLargestFree()
 {
-    int largest = -1;
+    int largest = 0;
     Element* element = memory.tail;
 
     while (element != NULL)
     {
         // Check if it's free and bigger
-        if (element->alloc == 0 || element->size > largest)
+        if (element->alloc == 0 && element->size > largest)
             largest = element->size;
 
         // Get next element
@@ -284,7 +296,7 @@ int getMemSmallFree(size_t size)
     while (element != NULL)
     {
         // Check size and if it's allocated
-        if (element->alloc == 0 || element->size < size)
+        if (element->alloc == 0 && element->size < size)
             blocks++;
 
         // Get next element
@@ -314,7 +326,7 @@ void printMemory()
     while (element != NULL)
     {
         // Print
-        printf("Element %u\n\tSize: %d\n\tAllocated: %d\n", count, element->size, element->alloc);
+        printf("Element %u\n\tSize: %d\n\tAllocated: %d\n\tPointer: %p\n", count, element->size, element->alloc, element->ptr);
 
         // Get next element
         count++;
@@ -341,14 +353,18 @@ Element* findByAddress(void* ptr)
     // Start from the tail
     Element* element = memory.tail;
 
-    while (element != NULL)
+    // Sure the pointer is even in the pool
+    if ( ptr >= memory.memPool.memStart && ptr < (memory.memPool.memStart + memory.memPool.size) )
     {
-        // Check if ptr is in range
-        if (element->ptr <= ptr || (element->ptr + element->size) > ptr)
-            return element;
+        while (element != NULL)
+        {
+            // Check if ptr is in range
+            if (ptr >= element->ptr && ptr < (element->ptr + element->size))
+                return element;
 
-        // Get next element
-        element = element->next;
+            // Get next element
+            element = element->next;
+        }
     }
 
     // If not found then return NULL
@@ -404,4 +420,91 @@ Element* allocateBlock(Element* space, size_t size)
         printf("\tRequested Size: %lu\n\tSize of Block: %u\n", size, space->size);
         return NULL;
     }
+}
+
+/**
+ * This takes care of freeing the memory, and takes 
+ * care of merging elements. It will also handle head, 
+ * tail and next pointers.
+ * @param element Pointer to element to be freed
+ */
+void freeElement(Element* element)
+{
+    // Free the block
+    element->alloc = 0;
+
+    // Merge forward
+    if (element->next != NULL)
+    {
+        if (element->next->alloc == 0)
+        { mergeForward(element); }
+    }
+
+    // Merge backwards
+    if (element->prev != NULL)
+    {
+        if (element->prev->alloc == 0)
+        { mergeBackwards(element); }
+    }
+}
+
+/**
+ * This merges the element with it's next element.
+ * This isn't taking allocation into consideration, 
+ * but makes sure head, tail and next is correct after 
+ * the merge.
+ * @param element The growing element
+ */
+void mergeForward(Element* element)
+{
+    Element* next = element->next;
+
+    // Set next and prev ptrs
+    element->next       = next->next;
+    if (next->next != NULL)
+        next->next->prev = element;
+
+    // Correct size
+    element->size += next->size;
+
+    // Check head
+    if (element->next == NULL)
+        memory.head = element;
+
+    // Check next
+    if (memory.next == next)
+        memory.next = element;
+
+    // Free memory
+    free(next);
+}
+
+/**
+ * This merges the element with it's prev element. 
+ * This isn't taking allocation into consideration, 
+ * but makes sure head, tail and next is correct after 
+ * the merge.
+ * @param element The growing element
+ */
+void mergeBackwards(Element* element)
+{
+    Element* previous = element->prev;
+
+    // Set next and prev pointers
+    element->prev = previous->prev;
+    if (element->prev != NULL)
+        element->prev->next = element;
+
+    // Memory pool pointer
+    element->ptr = previous->ptr;
+
+    // Correct size
+    element->size += previous->size;
+
+    // Check tail
+    if (element->prev == NULL)
+        memory.tail = element;
+
+    // Free memory
+    free(previous);
 }
