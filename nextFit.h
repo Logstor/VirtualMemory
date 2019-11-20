@@ -33,6 +33,8 @@ typedef struct
 	Element* head;
 	Element* tail;
 	Element* next;
+
+    size_t bytesFree;
 }Memory;
 
 /*
@@ -117,10 +119,18 @@ void initialize(size_t size)
     // Start linked list
     memory.head = (Element*) malloc( sizeof(Element) );
     memory.head->size = size;
+    memory.bytesFree  = size;
     memory.head->alloc = 0;
     memory.head->ptr = memory.memPool.memStart;
     memory.tail = memory.head;
     memory.next = memory.head;
+
+    /*
+    //TODO: Remove
+    char buffer[100];
+    sprintf(buffer, "Initializing %lu bytes\n", size);
+    writeLog(buffer);
+    */
 }
 
 /**
@@ -133,6 +143,10 @@ void initialize(size_t size)
  */
 void* nextMalloc(size_t requested) 
 {
+    // Check if there's space
+    if (memory.bytesFree < requested)
+        return NULL;
+
     Element* allocated;
 
     // Get current position
@@ -152,6 +166,7 @@ void* nextMalloc(size_t requested)
         {
             allocated = allocateBlock(element, requested);
             memory.next = allocated->next;
+            memory.bytesFree -= allocated->size;
             break;
         }
 
@@ -159,6 +174,13 @@ void* nextMalloc(size_t requested)
         element = element->next;
 
     } while (element != memory.next);
+
+    /*
+    //TODO: Remove
+    char buffer[100];
+    sprintf(buffer, "\nAllocating %lu bytes\n\n", requested);
+    writeLog(buffer);
+    */
     
     return allocated->ptr;
 }
@@ -174,6 +196,11 @@ void nextFree(void* block)
         printf("WARNING: Memory was already free!\n");
         return;
     }
+    /*
+    //TODO: Remove
+    char buffer[100];
+    sprintf(buffer, "\nFreeing %d bytes\n", element->size);
+    */
 
     // Free it
     freeElement(element);
@@ -218,22 +245,7 @@ int getMemHoles()
  * @return Bytes allocated
  */
 int getMemAllocated()
-{
-    int bytes = 0;
-    Element* element = memory.tail;
-
-    while (element != NULL)
-    {
-        // Check if it's allocated
-        if (element->alloc != 0)
-            bytes += element->size;
-
-        // Get next element
-        element = element->next;
-    }
-
-    return bytes;
-}
+{ return memory.memPool.size - memory.bytesFree; }
 
 /**
  * Finds the amount of bytes which is free in 
@@ -241,22 +253,7 @@ int getMemAllocated()
  * @return Amount of bytes free
  */
 int getMemFree()
-{
-    int bytes = 0;
-    Element* element = memory.tail;
-
-    while (element != NULL)
-    {
-        // Check if it's free
-        if (element->alloc == 0)
-            bytes += element->size;
-
-        // Get next element
-        element = element->next;
-    }
-
-    return bytes;
-}
+{ return memory.bytesFree; }
 
 /**
  * Number of bytes in the largest contiguous area 
@@ -432,6 +429,7 @@ void freeElement(Element* element)
 {
     // Free the block
     element->alloc = 0;
+    memory.bytesFree += element->size;
 
     // Merge forward
     if (element->next != NULL)
