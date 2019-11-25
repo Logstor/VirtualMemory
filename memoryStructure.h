@@ -31,3 +31,9 @@ typedef struct
 
     size_t bytesFree;
 }Memory;
+
+/*
+ * Globals
+ */
+
+Memory memory;
