@@ -9,7 +9,7 @@
 /*
  * Prototypes
 */
-void initialize(size_t size);
+void nextinit(size_t size);
 
 void* nextMalloc(size_t requested);
 void nextFree(void* block);
@@ -22,7 +22,7 @@ void mergeBackwards(Element* element);
 /*
  * Implementations
  */
-void initialize(size_t size)
+void nextinit(size_t size)
 {
     // Check parameter
     if (size < 1)

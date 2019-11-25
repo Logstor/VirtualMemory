@@ -92,7 +92,7 @@ void initmem(strategies strategy, size_t sz)
 	switch (myStrategy)
 	{
 	case Next:
-		initialize(sz);
+		nextinit(sz);
 		break;
 	
 	default:
