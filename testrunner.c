@@ -117,7 +117,7 @@ static int invoke_test_with_timelimit(testentry_t* test, int redirect_stdouterr,
 		}
 
 		if(child_pid != wait_val)
-			fprintf(stderr,"testrunner: strange... wait_val != child_pid\n");
+			fprintf(stderr,"testrunner: strange... wait_val != child_pid\n- wait_val = %d, child_pid = %d\n", wait_val, child_pid);
 
 		int passed= (child_pid == wait_val) && (child_exit_value==0) && (child_exited_normally!=0);
 

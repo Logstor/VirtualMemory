@@ -64,7 +64,7 @@ int getMemHoles()
     int holes = 0; 
     Element* element = memory.tail;
 
-    while (element != NULL)
+    do
     {
         // Check if it's free
         if (element->alloc == 0)
@@ -73,6 +73,7 @@ int getMemHoles()
         // Get next element
         element = element->next;
     }
+    while (element != NULL && element != memory.tail);
 
     return holes;
 }
@@ -103,7 +104,7 @@ int getMemLargestFree()
     int largest = 0;
     Element* element = memory.tail;
 
-    while (element != NULL)
+    do
     {
         // Check if it's free and bigger
         if (element->alloc == 0 && element->size > largest)
@@ -112,6 +113,7 @@ int getMemLargestFree()
         // Get next element
         element = element->next;
     }
+    while (element != NULL && element != memory.tail);
 
     return largest;
     
@@ -127,7 +129,7 @@ int getMemSmallFree(size_t size)
     int blocks = 0;
     Element* element = memory.tail;
 
-    while (element != NULL)
+    do
     {
         // Check size and if it's allocated
         if (element->alloc == 0 && element->size < size)
@@ -136,6 +138,7 @@ int getMemSmallFree(size_t size)
         // Get next element
         element = element->next;
     }
+    while (element != NULL && element != memory.tail);
 
     return blocks;
 
@@ -163,7 +166,7 @@ Element* findByAddress(void* ptr)
     // Sure the pointer is even in the pool
     if ( ptr >= memory.memPool.memStart && ptr < (memory.memPool.memStart + memory.memPool.size) )
     {
-        while (element != NULL)
+        do
         {
             // Check if ptr is in range
             if (ptr >= element->ptr && ptr < (element->ptr + element->size))
@@ -172,6 +175,7 @@ Element* findByAddress(void* ptr)
             // Get next element
             element = element->next;
         }
+        while (element != NULL && element != memory.tail);
     }
 
     // If not found then return NULL
