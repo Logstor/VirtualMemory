@@ -145,8 +145,8 @@ void printMemory()
     while (element != NULL)
     {
         // Print
-        printf("Element %u\n\tSize: %d\n\tAllocated: %d\n\tPointer: %p\n\tPrev: %p\n\tNext: %p\n", 
-        count, element->size, element->alloc, element->ptr, element->prev, element->next);
+        printf("Element %u\n\tSize: %d\n\tAllocated: %d\n\tPointer: %p\n\tSelf: %p\n\tPrev: %p\n\tNext: %p\n", 
+        count, element->size, element->alloc, element->ptr, element, element->prev, element->next);
 
         // Get next element
         count++;
