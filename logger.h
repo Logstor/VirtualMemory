@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define FILENAME "log.txt"
 
@@ -15,4 +16,23 @@ void writeLog(const char* data)
     fprintf(file, "%u: %s", logCount, data);
 
     fclose(file);
+}
+
+double timeIt(void a())
+{
+    // Initialize
+    clock_t start, end;
+    double timeTaken;
+
+    // Catch time
+    start = clock();
+
+    // Run function
+    a();
+
+    // Catch time
+    end = clock();
+
+    // Calc and return
+    return ((double) (end - start)) / CLOCKS_PER_SEC;
 }
