@@ -17,22 +17,3 @@ void writeLog(const char* data)
 
     fclose(file);
 }
-
-double timeIt(void a())
-{
-    // Initialize
-    clock_t start, end;
-    double timeTaken;
-
-    // Catch time
-    start = clock();
-
-    // Run function
-    a();
-
-    // Catch time
-    end = clock();
-
-    // Calc and return
-    return ((double) (end - start)) / CLOCKS_PER_SEC;
-}
