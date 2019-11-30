@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define FILENAME "log.txt"
+#define FILENAME "log.log"
 
 static unsigned int logCount = 0;
 
