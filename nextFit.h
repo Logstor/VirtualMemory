@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "logger.h"
 #include "memoryStructure.h"
+#include "utility.h"
 
 /*
  * Prototypes
