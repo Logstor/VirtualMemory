@@ -595,12 +595,41 @@ void try_mymem(int argc, char **argv) {
 	*/
 
 	initmem(strat, 100);
-	a = mymalloc(10);
-	b= mymalloc(1);
+	a = mymalloc(39);
+
+	print_memory();
+
+	initmem(strat, 250);
+	a = mymalloc(39);
+	b = mymalloc(28);
+	c = mymalloc(17);
+	d = mymalloc(77);
+	print_memory();
+	myfree(c);
+	print_memory();
 	myfree(a);
-	c = mymalloc(1);
+	print_memory();
+	print_memory_status();
+	a = mymalloc(20);
+	a = mymalloc(20);
+	a = mymalloc(20);
+	a = mymalloc(20);
+	a = mymalloc(20);
+	print_memory();
+	print_memory_status();
+	a = mymalloc(19);
+	print_memory();
+	print_memory_status();
+	a = mymalloc(17);
+	print_memory();
+	print_memory_status();
+	a = mymalloc(9);
+	myfree(b);
+	myfree(c);
+	myfree(d);
 	
 	print_memory();
 	print_memory_status();
+	
 	
 }

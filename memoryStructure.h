@@ -36,4 +36,4 @@ typedef struct
  * Globals
  */
 
-Memory memory;
+static Memory memory;

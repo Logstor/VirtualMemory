@@ -70,64 +70,108 @@ void nextinit(size_t size)
  */
 void* nextMalloc(size_t requested) 
 {
+    //TODO: Remove
+    char buffer[100];
+    sprintf(buffer, "Trying to allocate %lu bytes\n", requested);
+    writeLog(buffer);
+
     // Check if there's space
     if (memory.bytesFree < requested)
         return NULL;
+
+    //TODO: Remove
+    sprintf(buffer, "\tSpace check done\n");
+    writeLog(buffer);
 
     Element* allocated;
 
     // Get current position
     Element* element = memory.next;
 
+    //TODO: Remove
+    sprintf(buffer, "\tGotten current position\n");
+    writeLog(buffer);
+
     // Find space
     do
     {
+        //TODO: Remove
+        sprintf(buffer, "\tChecking for NULL\n");
+        writeLog(buffer);
+
         // Check NULL
         if (element == NULL)
         {
             element = memory.tail;
         }
 
+        //TODO: Remove
+        sprintf(buffer, "\tChecking for space and size\n");
+        writeLog(buffer);
+
         // Check space and alloc
         if (element->alloc == 0 && element->size >= requested)
         {
+            //TODO: Remove
+            sprintf(buffer, "\tFound space\n");
+            writeLog(buffer);
+
             allocated = allocateBlock(element, requested);
             memory.next = allocated->next;
             memory.bytesFree -= allocated->size;
             break;
         }
 
+        //TODO: Remove
+        sprintf(buffer, "\tGetting element->next\n");
+        writeLog(buffer);
+
         // Get next element
         element = element->next;
 
     } while (element != memory.next);
 
-    /*
+    
     //TODO: Remove
-    char buffer[100];
-    sprintf(buffer, "\nAllocating %lu bytes\n\n", requested);
-    writeLog(buffer);
-    */
+    if (allocated != NULL)
+    {
+        char buffer[100];
+        sprintf(buffer, "Allocating %lu bytes\n\n", requested);
+        writeLog(buffer);
+    }
+    else
+    {
+        char buffer[100];
+        sprintf(buffer, "Couldn't allocate %lu bytes\n\n", requested);
+        writeLog(buffer);
+    }
+    
     
     return allocated->ptr;
 }
 
 void nextFree(void* block) 
 {
+    //TODO: Remove
+    char buffer[100];
+    sprintf(buffer, "Freeing %p\n", block);
+    writeLog(buffer);
+    
     // Find the correct element
     Element* element = findByAddress(block);
+    if(element == NULL)
+        return;
 
     // Check for error
     if (element->alloc == 0)
     {
+        //TODO: Remove
+        sprintf(buffer, "\tWARNING: Memory was already free!\n");
+        writeLog(buffer);
+
         printf("WARNING: Memory was already free!\n");
         return;
     }
-    /*
-    //TODO: Remove
-    char buffer[100];
-    sprintf(buffer, "\nFreeing %d bytes\n", element->size);
-    */
 
     // Free it
     freeElement(element);
@@ -170,11 +214,26 @@ void printMemory()
  */
 Element* allocateBlock(Element* space, size_t size)
 {
+    //TODO: Remove
+    char buffer[100];
+    sprintf(buffer, "Allocating %lu byte block in element with size %d\n", size, space->size);
+    writeLog(buffer);
+
     // Space is bigger
     if (space->size > size)
     {
+        //TODO: Remove
+        sprintf(buffer, "\tSpace is bigger\n");
+        writeLog(buffer);
+
         // Split the block of space in two
         Element* newElement = (Element*) malloc( sizeof(Element) );
+        if (newElement == NULL)
+        {
+            //TODO: Remove!
+            sprintf(buffer, "\tMalloc failed!\n");
+            writeLog(buffer);
+        }
         newElement->next = space;
         newElement->prev = space->prev;
         newElement->ptr  = space->ptr;
@@ -198,6 +257,10 @@ Element* allocateBlock(Element* space, size_t size)
     // Space is equal
     else if (space->size == size)
     {
+        //TODO: Remove
+        sprintf(buffer, "\tSpace is equal\n");
+        writeLog(buffer);
+
         // Just allocate space, and return
         space->alloc = 1; return space;
     }
@@ -248,6 +311,11 @@ void freeElement(Element* element)
  */
 void mergeForward(Element* element)
 {
+    //TODO: Remove
+    char buffer[100];
+    sprintf(buffer, "Merging element %p forward\n", element);
+    writeLog(buffer);
+
     Element* next = element->next;
 
     // Set next and prev ptrs
@@ -266,6 +334,10 @@ void mergeForward(Element* element)
     if (memory.next == next)
         memory.next = element;
 
+    //TODO: Remove
+    sprintf(buffer, "\tRunning free() on %p\n", next);
+    writeLog(buffer);
+
     // Free memory
     free(next);
 }
@@ -279,6 +351,11 @@ void mergeForward(Element* element)
  */
 void mergeBackwards(Element* element)
 {
+    //TODO: Remove
+    char buffer[100];
+    sprintf(buffer, "Merging element %p backwards\n", element);
+    writeLog(buffer);
+
     Element* previous = element->prev;
 
     // Set next and prev pointers

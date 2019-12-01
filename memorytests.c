@@ -93,9 +93,16 @@ void do_randomized_test(int strategyToUse, int totalSize, float fillRatio, int m
 				myfree(pointer);
 			}
 
+			writeLog("Trying to find largest free\n");
 			sum_largest_free += mem_largest_free();
+
+			writeLog("Trying to find hole size\n");
 			sum_hole_size += (mem_free() / mem_holes());
+
+			writeLog("Trying to find memory allocated\n");
 			sum_allocated += mem_allocated();
+
+			writeLog("Trying to find memory smaller than x\n");
 			sum_small += mem_small_free(smallBlockSize);
 		}
 
@@ -127,12 +134,34 @@ int do_stress_tests(int argc, char **argv)
 
 	unlink("tests.log");  // We want a new log file
 
+	//TODO: Remove!
+	char buffer[100];
+
+	sprintf(buffer, "1. Randomized test, Fill Factor: %f\n", 0.25);
+	writeLog(buffer);
 	do_randomized_test(strategy,10000,0.25,1,1000,10000);
+
+	sprintf(buffer, "2. Randomized test, Fill Factor: %f\n", 0.25);
+	writeLog(buffer);
 	do_randomized_test(strategy,10000,0.25,1,2000,10000);
+
+	sprintf(buffer, "3. Randomized test, Fill Factor: %f\n", 0.25);	
+	writeLog(buffer);
 	do_randomized_test(strategy,10000,0.25,1000,2000,10000);
+
+	sprintf(buffer, "4. Randomized test, Fill Factor: %f\n", 0.25);	
+	writeLog(buffer);
 	do_randomized_test(strategy,10000,0.25,1,3000,10000);
+
+	sprintf(buffer, "5. Randomized test, Fill Factor: %f\n", 0.25);	
+	writeLog(buffer);
 	do_randomized_test(strategy,10000,0.25,1,4000,10000); 
+
+	sprintf(buffer, "6. Randomized test, Fill Factor: %f\n", 0.25);	
+	writeLog(buffer);
 	do_randomized_test(strategy,10000,0.25,1,5000,10000);
+
+
 
 	do_randomized_test(strategy,10000,0.5,1,1000,10000);
 	do_randomized_test(strategy,10000,0.5,1,2000,10000);

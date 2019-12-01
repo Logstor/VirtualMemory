@@ -160,12 +160,25 @@ char isMemAlloc(void *ptr) { return findByAddress(ptr) != NULL ? 666 : 0 ; }
  */
 Element* findByAddress(void* ptr)
 {
+    //TODO: Remove
+    char buffer[100];
+    sprintf(buffer, "Finding element by address %p\n", ptr);
+    writeLog(buffer);
+
     // Start from the tail
     Element* element = memory.tail;
+
+    //TODO: Remove
+    sprintf(buffer, "\tTail gotten\n");
+    writeLog(buffer);
 
     // Sure the pointer is even in the pool
     if ( ptr >= memory.memPool.memStart && ptr < (memory.memPool.memStart + memory.memPool.size) )
     {
+        //TODO: Remove
+        sprintf(buffer, "\tPointer is between %p and %p\n", memory.memPool.memStart, memory.memPool.memStart + memory.memPool.size);
+        writeLog(buffer);
+
         do
         {
             // Check if ptr is in range
@@ -176,6 +189,11 @@ Element* findByAddress(void* ptr)
             element = element->next;
         }
         while (element != NULL && element != memory.tail);
+    }
+    else {
+        //TODO: Remove
+        sprintf(buffer, "\tPointer wasn't in range!\n");
+        writeLog(buffer);
     }
 
     // If not found then return NULL
