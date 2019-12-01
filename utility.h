@@ -17,3 +17,4 @@ int getMemSmallFree(size_t size);
 char isMemAlloc(void *ptr);
 
 Element* findByAddress(void* ptr);
+Element* allocateBlock(Element* space, size_t size);
