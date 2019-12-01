@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "logger.h"
-#include "memoryStructure.h"
 #include "utility.h"
 
 /*
