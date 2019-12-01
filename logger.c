@@ -1,10 +1,8 @@
-#pragma once
+#include "logger.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-#define FILENAME "log.log"
 
 static unsigned int logCount = 0;
 

@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "logger.h"
-#include "memoryStructure.h"
 #include "utility.h"
 
 /*
@@ -44,11 +42,11 @@ void nextinit(size_t size)
     memory.memPool.memStart = malloc(size);
 
     // Start linked list
-    memory.head = (Element*) malloc( sizeof(Element) );
+    memory.head = (Element*) calloc( 1, sizeof(Element) );
     memory.head->size = size;
-    memory.bytesFree  = size;
     memory.head->alloc = 0;
     memory.head->ptr = memory.memPool.memStart;
+    memory.bytesFree  = size;
     memory.tail = memory.head;
     memory.next = memory.head;
 
@@ -145,7 +143,8 @@ void printMemory()
     while (element != NULL)
     {
         // Print
-        printf("Element %u\n\tSize: %d\n\tAllocated: %d\n\tPointer: %p\n", count, element->size, element->alloc, element->ptr);
+        printf("Element %u\n\tSize: %d\n\tAllocated: %d\n\tPointer: %p\n\tSelf: %p\n\tPrev: %p\n\tNext: %p\n", 
+        count, element->size, element->alloc, element->ptr, element, element->prev, element->next);
 
         // Get next element
         count++;
