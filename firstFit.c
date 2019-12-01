@@ -38,5 +38,27 @@ void firstInit(size_t size)
 
 void* firstMalloc(size_t requested)
 {
-    
+    // Check if there's space
+    if (memory.bytesFree < requested)
+        return NULL;
+
+    // Get current position
+    Element* element = memory.tail;
+
+    // Find space
+    do 
+    {
+        // Check space and alloc
+        if (element->alloc == 0 && element->size >= requested)
+        {
+            Element* allocated = allocateBlock(element, requested);
+            memory.bytesFree -= allocated->size;
+            return allocated->ptr;
+        }
+
+        // Get next element
+        element = element->next;
+    } while (element != memory.tail && element != NULL);
+
+    return NULL;
 }

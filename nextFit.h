@@ -92,7 +92,7 @@ void* nextMalloc(size_t requested)
             allocated = allocateBlock(element, requested);
             memory.next = allocated->next;
             memory.bytesFree -= allocated->size;
-            break;
+            return allocated->ptr;
         }
 
         // Get next element
@@ -107,7 +107,7 @@ void* nextMalloc(size_t requested)
     writeLog(buffer);
     */
     
-    return allocated->ptr;
+    return NULL;
 }
 
 void nextFree(void* block) 
@@ -159,56 +159,7 @@ void printMemory()
  * Support Methods
  */
 
-/**
- * This method allocates the memory, and takes care of 
- * splitting Elements, head and tail.
- * @param space Pointer to Element with enough space
- * @param size Space needed in bytes
- * @return Pointer to the allocated block
- */
-Element* allocateBlock(Element* space, size_t size)
-{
-    // Space is bigger
-    if (space->size > size)
-    {
-        // Split the block of space in two
-        Element* newElement = (Element*) malloc( sizeof(Element) );
-        newElement->next = space;
-        newElement->prev = space->prev;
-        newElement->ptr  = space->ptr;
-        newElement->size = size;
-        newElement->alloc= 1;
 
-        space->prev  = newElement;
-        space->ptr  += size;
-        space->size -= size;
-
-        if (newElement->prev != NULL)
-            newElement->prev->next = newElement;
-
-        // Take care of tail
-        if (newElement->prev == NULL)
-            memory.tail = newElement;
-
-        return newElement;
-    }
-
-    // Space is equal
-    else if (space->size == size)
-    {
-        // Just allocate space, and return
-        space->alloc = 1; return space;
-    }
-
-    // Error occurred
-    else
-    {
-        // Write error to log
-        printf("ERROR: allocateBlock() is called, when there isn't not enough space:\n");
-        printf("\tRequested Size: %lu\n\tSize of Block: %u\n", size, space->size);
-        return NULL;
-    }
-}
 
 /**
  * This takes care of freeing the memory, and takes 
